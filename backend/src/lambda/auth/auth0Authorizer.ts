@@ -20,18 +20,15 @@ const logger: Logger = createLogger('auth')
 // TODO: Provide a URL that can be used to download a certificate that can be used
 // to verify JWT token signature.
 // To get this URL you need to go to an Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
-const jwksUrl: string =
-  'https://dev-06m895h6.eu.auth0.com/.well-known/jwks.json'
-
-let cert: any, certValue: string, finalCertKey: string
+const jwksUrl = 'https://dev-06m895h6.eu.auth0.com/.well-known/jwks.json'
 
 export const handler = async (
   event: CustomAuthorizerEvent
 ): Promise<CustomAuthorizerResult> => {
-  logger.info('Authorizing a user', event.authorizationToken)
+  console.log('Authorizing a user', event.authorizationToken)
   try {
     const jwtToken = await verifyToken(event.authorizationToken)
-    logger.info('User was authorized', jwtToken)
+    console.log('User was authorized', jwtToken)
 
     return {
       principalId: jwtToken.sub,
@@ -68,38 +65,38 @@ export const handler = async (
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const token = getToken(authHeader)
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
-
+  console.log(`jwt ${JSON.stringify(jwt)}`)
   // TODO: Implement token verification
   // You should implement it similarly to how it was implemented for the exercise for the lesson 5
   // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-  if (!cert) {
-    let certRequest = await Axios.get(jwksUrl)
-    cert = certRequest.data
+  let certRequest = await Axios.get(jwksUrl)
+  console.log(`Cert request:`, certRequest)
+  const cert = certRequest.data
 
-    if (certRequest.status > 299)
-      logger.error('Request failed for jwttoken certificate')
-  }
+  console.log(`certificate`, cert)
 
-  certValue = ExtractX5cKey(jwt)
+  const certValue = extractX5cKey(cert, jwt)
+  console.log(`certificate value`, certValue)
 
-  finalCertKey = generateCertificateKey()
+  const finalCertKey = generateCertificateKey(certValue)
+  console.log(`certificate key`, finalCertKey)
 
-  logger.debug('bla', cert, certValue, finalCertKey)
+  const verified = verify(token, finalCertKey, {
+    algorithms: ['RS256']
+  })
+  console.log(`verified`, verified)
 
-  return verify(token, finalCertKey, { algorithms: ['RS256'] }) as JwtPayload
+  console.log(cert, certValue, finalCertKey, verified)
+  return verified as JwtPayload
 }
 
-function ExtractX5cKey(jwt: Jwt) {
-  if (!certValue) return certValue
-
+function extractX5cKey(cert: any, jwt: Jwt) {
   const keys: any[] = cert.keys
   const signingKey = keys.find((key) => key.kid === jwt.header.kid)
-  return signingKey.x5c[0]
+  return signingKey.x5c[0].match(/.{1,64}/g).join('\n')
 }
 
-function generateCertificateKey(): string {
-  if (!finalCertKey) return finalCertKey
-
+function generateCertificateKey(certValue: string): string {
   return `-----BEGIN CERTIFICATE-----\n${certValue}\n-----END CERTIFICATE-----\n`
 }
 

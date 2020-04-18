@@ -8,7 +8,7 @@ import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 
 const XAWS = AWSXRay.captureAWS(AWS)
-const image_bucket_name: string = process.env.IMAGES_S3_BUCKET
+const ATTACHMENT_S3_BUCKET: string = process.env.ATTACHMENT_S3_BUCKET
 const EXPIRES: number = Number(process.env.SIGNED_URL_EXPIRATION)
 const logger: Logger = createLogger('TodoDataLayer')
 
@@ -92,7 +92,7 @@ export class TodoDataLayer {
   async updateTodo(
     userId: string,
     todoId: string,
-    todoRquest: UpdateTodoRequest
+    todoRequest: UpdateTodoRequest
   ): Promise<TodoItem> {
     this.logger.info(`update todo (${todoId}) for user ${userId}`)
 
@@ -103,11 +103,15 @@ export class TodoDataLayer {
           todoId,
           userId
         },
-        UpdateExpression: 'SET name = :name, dueDate = :dueDate, done = :done',
+        UpdateExpression:
+          'SET #todoItemName = :name, dueDate = :dueDate, done = :done',
         ExpressionAttributeValues: {
-          ':name': todoRquest.name,
-          ':dueDate': todoRquest.dueDate,
-          ':done': todoRquest.done
+          ':name': todoRequest.name,
+          ':dueDate': todoRequest.dueDate,
+          ':done': todoRequest.done
+        },
+        ExpressionAttributeNames: {
+          '#todoItemName': 'name'
         },
         ReturnValues: 'ALL_NEW'
       })
@@ -118,7 +122,7 @@ export class TodoDataLayer {
 
   async getSignedUploadUrl(todoId: string): Promise<string> {
     return this.s3Client.getSignedUrl('putObject', {
-      Bucket: image_bucket_name,
+      Bucket: ATTACHMENT_S3_BUCKET,
       Key: todoId,
       Expires: EXPIRES
     })

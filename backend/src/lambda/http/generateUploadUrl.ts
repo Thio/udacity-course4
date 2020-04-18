@@ -5,7 +5,6 @@ import {
   APIGatewayProxyResult
 } from 'aws-lambda'
 import * as middy from 'middy'
-import { cors } from 'middy/middlewares'
 import { Logger } from 'winston'
 
 import {
@@ -20,8 +19,8 @@ import {
 
 const logger: Logger = createLogger('deleteTodo')
 
-const image_bucket_name: string = process.env.IMAGES_S3_BUCKET
-const ContantUrl: string = `https://${image_bucket_name}.s3.amazonaws.com`
+const ATTACHMENT_S3_BUCKET: string = process.env.ATTACHMENT_S3_BUCKET
+const ContantUrl: string = `https://${ATTACHMENT_S3_BUCKET}.s3.amazonaws.com`
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -41,8 +40,8 @@ export const handler = middy(
   }
 )
 
-handler.use(
-  cors({
-    credentials: true
-  })
-)
+// handler.use(
+//   cors({
+//     credentials: true
+//   })
+// )
