@@ -25,10 +25,10 @@ const jwksUrl = 'https://dev-06m895h6.eu.auth0.com/.well-known/jwks.json'
 export const handler = async (
   event: CustomAuthorizerEvent
 ): Promise<CustomAuthorizerResult> => {
-  console.log('Authorizing a user', event.authorizationToken)
+  logger.info(`Authorizing a user ${event.authorizationToken}`)
   try {
     const jwtToken = await verifyToken(event.authorizationToken)
-    console.log('User was authorized', jwtToken)
+    logger.info('User was authorized', jwtToken)
 
     return {
       principalId: jwtToken.sub,
@@ -65,28 +65,21 @@ export const handler = async (
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const token = getToken(authHeader)
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
-  console.log(`jwt ${JSON.stringify(jwt)}`)
   // TODO: Implement token verification
   // You should implement it similarly to how it was implemented for the exercise for the lesson 5
   // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
   let certRequest = await Axios.get(jwksUrl)
-  console.log(`Cert request:`, certRequest)
   const cert = certRequest.data
 
-  console.log(`certificate`, cert)
-
   const certValue = extractX5cKey(cert, jwt)
-  console.log(`certificate value`, certValue)
 
   const finalCertKey = generateCertificateKey(certValue)
-  console.log(`certificate key`, finalCertKey)
 
   const verified = verify(token, finalCertKey, {
     algorithms: ['RS256']
   })
-  console.log(`verified`, verified)
 
-  console.log(cert, certValue, finalCertKey, verified)
+  logger.info(`${jwt}, ${cert}, ${certValue}, ${finalCertKey}, ${verified}`)
   return verified as JwtPayload
 }
 
