@@ -1,6 +1,7 @@
 # Serverless TODO
 
-To implement this project, you need to implement a simple TODO application using AWS Lambda and Serverless framework. Search for all comments starting with the `TODO:` in the code to find the placeholders that you need to implement.
+This is my interpretation of the udacity cloud developer course for serverless.
+Starterproject can be found here: https://github.com/udacity/cloud-developer/tree/master/course-04/project/c4-final-project-starter-code
 
 # Functionality of the application
 
