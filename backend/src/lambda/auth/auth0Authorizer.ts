@@ -1,12 +1,19 @@
-import { CustomAuthorizerEvent, CustomAuthorizerResult } from 'aws-lambda'
 import 'source-map-support/register'
 
-import { verify, decode } from 'jsonwebtoken'
-
+import {
+  CustomAuthorizerEvent,
+  CustomAuthorizerResult
+} from 'aws-lambda'
 import Axios from 'axios'
+import {
+  decode,
+  verify
+} from 'jsonwebtoken'
+
 import { Jwt } from '../../auth/Jwt'
 import { JwtPayload } from '../../auth/JwtPayload'
 import { createLogger } from '../../utils/logger'
+
 const logger = createLogger('auth')
 
 // TODO: Provide a URL that can be used to download a certificate that can be used
@@ -14,7 +21,8 @@ const logger = createLogger('auth')
 // To get this URL you need to go to an Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
 const jwksUrl: string =
   'https://dev-06m895h6.eu.auth0.com/.well-known/jwks.json'
-let cert, certValue
+
+let cert: any, certValue: string, finalCertKey: string
 
 export const handler = async (
   event: CustomAuthorizerEvent
@@ -63,20 +71,17 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   // TODO: Implement token verification
   // You should implement it similarly to how it was implemented for the exercise for the lesson 5
   // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-  if (cert) {
+  if (!cert) {
     let certRequest = await Axios.get(jwksUrl)
     cert = certRequest.data
 
-    if (certRequest.status > 299) {
+    if (certRequest.status > 299)
       logger.error('Request failed for jwttoken certificate')
-    }
   }
 
-  if (certValue) {
-    certValue = ExtractX5cKey(jwt)
-  }
+  certValue = ExtractX5cKey(jwt)
 
-  const finalCertKey = generateCertificateKey()
+  finalCertKey = generateCertificateKey()
 
   logger.debug('bla', cert, certValue, finalCertKey)
 
@@ -84,12 +89,16 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
 }
 
 function ExtractX5cKey(jwt: Jwt) {
+  if (!certValue) return certValue
+
   const keys: any[] = cert.keys
   const signingKey = keys.find((key) => key.kid === jwt.header.kid)
   return signingKey.x5c[0]
 }
 
 function generateCertificateKey(): string {
+  if (!finalCertKey) return finalCertKey
+
   return `-----BEGIN CERTIFICATE-----\n${certValue}\n-----END CERTIFICATE-----\n`
 }
 
