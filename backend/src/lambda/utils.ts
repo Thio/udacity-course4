@@ -30,9 +30,9 @@ export function generateResponse(
 ): APIGatewayProxyResult {
   return {
     statusCode,
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    },
+    // headers: {
+    //   'Access-Control-Allow-Origin': '*'
+    // },
     body: !!body ? JSON.stringify(body) : ''
   }
 }

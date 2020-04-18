@@ -5,6 +5,7 @@ import {
   APIGatewayProxyResult
 } from 'aws-lambda'
 import * as middy from 'middy'
+import { cors } from 'middy/middlewares'
 import { Logger } from 'winston'
 
 import { createTodo } from '../../businessLogic/todoService'
@@ -31,8 +32,8 @@ export const handler = middy(
   }
 )
 
-// handler.use(
-//   cors({
-//     credentials: true
-//   })
-// )
+handler.use(
+  cors({
+    credentials: true
+  })
+)
