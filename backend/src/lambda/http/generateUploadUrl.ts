@@ -1,18 +1,28 @@
 import 'source-map-support/register'
-import { createLogger } from '../../utils/logger'
-const logger = createLogger('deleteTodo')
+
 import {
   APIGatewayProxyEvent,
-  APIGatewayProxyResult,
-  APIGatewayProxyHandler
+  APIGatewayProxyResult
 } from 'aws-lambda'
+import * as middy from 'middy'
+import { cors } from 'middy/middlewares'
 
-export const handler: APIGatewayProxyHandler = async (
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> => {
-  const todoId = event.pathParameters.todoId
-  logger.info(todoId)
+import { createLogger } from '../../utils/logger'
 
-  // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-  return undefined
-}
+const logger = createLogger('deleteTodo')
+
+export const handler = middy(
+  async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    const todoId = event.pathParameters.todoId
+    logger.info(todoId)
+
+    // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
+    return undefined
+  }
+)
+
+handler.use(
+  cors({
+    credentials: true
+  })
+)
