@@ -17,6 +17,9 @@ export const handler = middy(
     logger.info(todoId)
 
     // TODO: Remove a TODO item by id
+    // deleteTodoItem -> TodoService (businesslogic)
+
+    // return 204 (noContent) -> no body
     return undefined
   }
 )

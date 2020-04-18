@@ -16,7 +16,13 @@ export const handler = middy(
     const todoId = event.pathParameters.todoId
     logger.info(todoId)
 
-    // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
+    // Build img url https + Bucketname + s3.amazon.com + todoitem
+
+    // Get signed url -> DataLayer -> S3Client
+
+    // Update AttachmentUrl for Todo item  -> TodoService (businesslogic)
+
+    // return 200 -> stringify url
     return undefined
   }
 )

@@ -18,7 +18,9 @@ export const handler = middy(
     const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
     logger.info(todoId, updatedTodo)
 
-    // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
+    // update todoitem  -> TodoService (businesslogic)
+
+    // return 200 -> stringify updated item
     return undefined
   }
 )
