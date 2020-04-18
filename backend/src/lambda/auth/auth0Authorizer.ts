@@ -9,12 +9,13 @@ import {
   decode,
   verify
 } from 'jsonwebtoken'
+import { Logger } from 'winston'
 
 import { Jwt } from '../../auth/Jwt'
 import { JwtPayload } from '../../auth/JwtPayload'
 import { createLogger } from '../../utils/logger'
 
-const logger = createLogger('auth')
+const logger: Logger = createLogger('auth')
 
 // TODO: Provide a URL that can be used to download a certificate that can be used
 // to verify JWT token signature.

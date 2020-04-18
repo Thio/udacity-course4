@@ -13,7 +13,7 @@
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^6.1.4",
     "source-map-support": "^0.5.11",
-    "uuid": "^3.3.2",
+    "uuid": "^3.4.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {
