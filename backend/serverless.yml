@@ -21,7 +21,11 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
 
- environment:
+  tracing:
+    lambda: true
+    apiGateway: true
+
+  environment:
     TODOS_TABLE: Todos-holzer-${self:provider.stage}
     TODO_INDEX_NAME: Todos-holzer-Index-${self:provider.stage}
     ATTACHMENT_S3_BUCKET: serverless-todos-holzer-images-bucket-${self:provider.stage}
@@ -41,8 +45,6 @@ functions:
           cors: true
           authorizer: Auth
 
-  # TODO: Configure this function
-  GetTodos:
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:
@@ -71,7 +73,7 @@ functions:
           path: todos/{todoId}
           cors: true
           authorizer: Auth
-    
+
   # TODO: Configure this function
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
@@ -108,7 +110,7 @@ resources:
               - AttributeName: todoId
                 KeyType: RANGE
             Projection:
-              ProjectionType: ALL 
+              ProjectionType: ALL
 
     AttachmentsBucket:
       Type: AWS::S3::Bucket
